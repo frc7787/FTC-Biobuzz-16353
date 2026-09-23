@@ -6,8 +6,10 @@ public class Math {
         else return input;
     }
 
-    public static Double CoerceIn() {
-
+    public static Double CoerceIn(Double minimum, Double input, Double maximum) {
+        if (minimum >= input) return minimum;
+        else if (maximum <= input) return maximum;
+        else return input;
     }
 
 }
