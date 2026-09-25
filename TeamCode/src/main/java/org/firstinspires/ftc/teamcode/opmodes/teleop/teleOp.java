@@ -5,25 +5,36 @@ import static com.pedropathing.ivy.Scheduler.schedule;
 import com.pedropathing.ivy.Scheduler;
 import com.pedropathing.ivy.commands.Commands;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.control.Robot;
 
-public class teleOp extends OpMode {
-    protected Robot robot;
+import java.util.List;
 
-    @Override
-    public void init() {
-        Scheduler.reset();
-        robot = new Robot(this);
+import dev.nextftc.robot.NextRobot;
+import dev.nextftc.robot.opmode.NextOpMode;
+import dev.nextftc.robot.opmode.NextTeleop;
+import dev.nextftc.robot.opmode.OpModeHook;
+
+@NextTeleop(name = "TeleOp")
+public class teleOp extends NextOpMode {
+    public final Robot robot;
+
+    public teleOp(Robot robot) {
+        super((NextRobot) robot);
+        this.robot = robot;
     }
+
 
     @Override
     public void start() {
         robot.flywheel.on();
+        robot.drivetrain.startDrive(gamepad1);
     }
 
     @Override
-    public void loop() {
+    public void periodic() {
         robot.periodic();
 
         if (gamepad2.dpadDownWasPressed()) {
@@ -41,11 +52,12 @@ public class teleOp extends OpMode {
         if (gamepad2.squareWasReleased()) {
             robot.flywheel.isActive = !robot.flywheel.isActive;
         }
-        if (gamepad2.rightBumperWasReleased()) {
-            schedule(robot.intake.intake());
-        }
-        if (gamepad2.leftBumperWasReleased()) {
-            schedule(robot.intake.outtake());
+        if (gamepad2.right_trigger > 0.05) {
+            robot.intake.setIntakePower(gamepad2.right_trigger);
+        } else if (gamepad2.left_trigger > 0.05) {
+            robot.intake.setIntakePower(-gamepad2.left_trigger);
+        } else {
+            robot.intake.setIntakePower((float) 0.0);
         }
 
         robot.follower.manual(

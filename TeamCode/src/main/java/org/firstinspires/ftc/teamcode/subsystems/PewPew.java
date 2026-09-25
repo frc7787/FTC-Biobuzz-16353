@@ -2,29 +2,25 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static com.pedropathing.ivy.commands.Commands.infinite;
 import static dev.nextftc.units.Units.RotationsPerMinute;
+import static dev.nextftc.units.Units.getRpm;
 
 import com.pedropathing.ivy.Command;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.control.Math;
 import org.firstinspires.ftc.teamcode.control.Robot;
 
 import dev.nextftc.hardware.actuators.NextMotor;
+import dev.nextftc.robot.Mechanism;
+import dev.nextftc.robot.Telemetry;
 import dev.nextftc.units.measuretypes.AngularVelocity;
 
-public class PewPew {
-    private NextMotor Motor;
-    private final Telemetry telemetry;
+public class PewPew implements Mechanism {
+    private NextMotor Motor = new NextMotor("flywheelMotor");
     private Double targetVelocity = 3500.0;
     public boolean isActive = false;
 
-    public PewPew(Robot robot) { //class constructor
-        Motor = robot.hardwareMap.get(
-                NextMotor.class,
-                "pewPewMotor"
-        );
-        telemetry = robot.telemetry;
-    }
     public void on() {
         isActive = true;
     }
@@ -46,14 +42,13 @@ public class PewPew {
         return Motor.getEncoderVelocity();
     }
 
-    public Command periodic() {
-        return infinite(() -> {
+    @Override
+    public void periodic() {
             if (isActive) {
                 Motor.setVelocitySetpoint(RotationsPerMinute.of(targetVelocity));
             } else {
-                Motor.setVelocitySetpoint(RotationsPerMinute.of(0));
+                Motor.setVelocitySetpoint(RotationsPerMinute.of(0.0));
             }
-            telemetry.addData("shooter Velocity:", this.getVelocity());
-        }).requiring(this);
+            Telemetry.log("shooter Velocity:", this.getVelocity());
     }
 }
