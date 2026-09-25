@@ -1,22 +1,19 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static com.pedropathing.ivy.commands.Commands.infinite;
-import static com.pedropathing.ivy.commands.Commands.instant;
-
 import static dev.nextftc.units.Units.RotationsPerMinute;
 
-import com.pedropathing.ivy.Command;
-
 import org.firstinspires.ftc.teamcode.control.Math;
-import org.firstinspires.ftc.teamcode.control.Robot;
 
 import dev.nextftc.hardware.actuators.NextMotor;
 import dev.nextftc.robot.Mechanism;
 import dev.nextftc.robot.Telemetry;
+import dev.nextftc.robot.triggers.CommandGamepad;
 import dev.nextftc.units.measuretypes.AngularVelocity;
 
 public class Flywheel implements Mechanism {
     private NextMotor leftMotor = new NextMotor("leftFlywheelMotor");
+
+
     private NextMotor rightMotor = new NextMotor("rightFlywheelMotor");
     private Double targetVelocity = 3500.0;
     public boolean isActive = false;
@@ -48,6 +45,16 @@ public class Flywheel implements Mechanism {
 
     public AngularVelocity getVelocity() {
         return rightMotor.getEncoderVelocity();
+    }
+
+    public void start(CommandGamepad commandGamepad) {
+        leftMotor.setDirection(NextMotor.Direction.REVERSE);
+        commandGamepad.dpadUp().onTrue(instant(() -> targetVelocity+= 100.0));
+        commandGamepad.dpadDown().onTrue(instant(() -> targetVelocity-= 100.0));
+        commandGamepad.dpadLeft().onTrue(instant(() -> targetVelocity+= 20.0));
+        commandGamepad.dpadRight().onTrue(instant(() -> targetVelocity-= 20.0));
+        commandGamepad.leftBumper().onTrue(instant(() -> isActive = true));
+        commandGamepad.rightBumper().onTrue(instant(() -> isActive = false));
     }
 
     @Override
