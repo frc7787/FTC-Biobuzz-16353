@@ -11,10 +11,10 @@ import dev.nextftc.robot.triggers.CommandGamepad;
 import dev.nextftc.units.measuretypes.AngularVelocity;
 
 public class Flywheel implements Mechanism {
-    private NextMotor leftMotor = new NextMotor("leftFlywheelMotor");
+    private NextMotor leftMotor = new NextMotor("shooterLeft");
 
 
-    private NextMotor rightMotor = new NextMotor("rightFlywheelMotor");
+    private NextMotor rightMotor = new NextMotor("shooterRight");
     private Double targetVelocity = 3500.0;
     public boolean isActive = false;
 
