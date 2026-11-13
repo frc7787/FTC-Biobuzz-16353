@@ -3,6 +3,9 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import static dev.nextftc.units.Units.DegreesPerSecond;
 import static dev.nextftc.units.Units.RotationsPerMinute;
 
+import com.pedropathing.ivy.Command;
+import com.pedropathing.ivy.CommandBuilder;
+
 import org.firstinspires.ftc.teamcode.control.Math;
 
 import dev.nextftc.hardware.actuators.NextMotor;
@@ -20,6 +23,9 @@ public class Flywheel implements Mechanism {
 
     public void on() {
         isActive = true; }
+    public Command enable = instant(this::on);
+
+    public Command disable = instant(this::off);
 
     public void off() { isActive = false; }
 

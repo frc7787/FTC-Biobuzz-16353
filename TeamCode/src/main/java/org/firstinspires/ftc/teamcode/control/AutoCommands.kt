@@ -16,9 +16,9 @@ import org.firstinspires.ftc.teamcode.subsystems.Intake
 
 fun shoot(flywheel: Flywheel) = instant{flywheel.on()}
 
-fun IntakeShoot(robot: Robot, toIntake: Path, toShoot: Path): Command {
-    return sequential(follow(robot.follower, toIntake),
+fun IntakeShoot(robot: Robot, toIntake: Path, toShoot: Path, follower: Follower): Command {
+    return sequential(follow(follower, toIntake),
         robot.intake.intake(),
-        follow(robot.follower, toShoot),
+        follow(follower, toShoot),
         shoot(robot.flywheel))
 }

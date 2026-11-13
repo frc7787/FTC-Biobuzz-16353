@@ -22,13 +22,13 @@ public class Robot implements NextRobot {
     protected HardwareMap hardwareMap;
     public Drivetrain drivetrain;
 
-    public Follower follower;
+    //public Follower follower;
 
     public Robot() {
         flywheel = new Flywheel();
         intake = new Intake();
         drivetrain = new Drivetrain();
-//        follower = Constants.create(hardwareMap);
+        //follower = Constants.create(hardwareMap);
     }
 
     @Override
@@ -39,6 +39,11 @@ public class Robot implements NextRobot {
         , drivetrain
         );
     }
+
+//    @Override
+//    public void periodic() {
+//        follower.update();
+//    }
 
     public void destroy() {
 
