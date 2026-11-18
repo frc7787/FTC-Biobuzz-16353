@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
-@TeleOp(group = "$")
+@TeleOp(name="DualDriver",group = "$")
 public class DualDriver extends OpMode {
     private DcMotorEx flywheelMotorOne,
             flywheelMotorTwo,

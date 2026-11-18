@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
-@TeleOp(group = "$")
+@TeleOp(name="SingleDriver",group = "$")
 public class SingleDriver extends OpMode {
     private DcMotorEx flywheelMotorOne,
             flywheelMotorTwo,
