@@ -21,6 +21,10 @@ public class teleOp extends OpMode {
     public DcMotorEx intake;
     public Drivetrain drivetrain;
 
+    public double CLOSE_RPM = 1200;
+
+    public double FAR_RPM = 2400;
+
 
     @Override
     public void init() {
@@ -45,15 +49,22 @@ public class teleOp extends OpMode {
 
     @Override
     public void loop() {
+        if (gamepad2.triangleWasPressed()) {
+            flywheel.setTargetVelocity(CLOSE_RPM);
+        } else if (gamepad2.squareWasPressed()) {
+            flywheel.setTargetVelocity(FAR_RPM);
+        }
         if (gamepad2.dpadUpWasPressed()) {
             flywheel.adjustTarget(100);
-        } if (gamepad2.dpadDownWasPressed()) {
+        } else if (gamepad2.dpadDownWasPressed()) {
             flywheel.adjustTarget(-100);
-        } if (gamepad2.circleWasPressed()) {
+        }
+        if (gamepad2.circleWasPressed()) {
             flywheel.toggle();
         } else if (gamepad2.dpadLeftWasPressed()) {
             flywheel.home();
-        } if (gamepad2.dpadRightWasPressed()) {
+        }
+        if (gamepad2.dpadRightWasPressed()) {
             flywheel.reverse();
         }
         Scheduler.execute();
