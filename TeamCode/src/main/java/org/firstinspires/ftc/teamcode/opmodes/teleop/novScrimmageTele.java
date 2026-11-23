@@ -137,21 +137,27 @@ public class novScrimmageTele extends OpMode {
                     timer.reset();
                     flywheelMotorOne.setVelocity(currentRpm);
                     flywheelMotorTwo.setVelocity(currentRpm);
-                    if (timer.seconds() >= 2){
-                        amountAway = flywheelMotorOne.getCurrentPosition()%180;
+                    telemetry.addData("amount of time passed", timer);
+                    telemetry.update();
+                    if (timer.seconds() >= 1){
+                        telemetry.addData("amount of time passed", timer);
+                        telemetry.update();
+                        flywheelMotorOne.setPower(0.0);
+                        break;
+                        /*amountAway = flywheelMotorOne.getCurrentPosition()%180;
                         if (amountAway != 0){
                             flywheelMotorOne.setPower(0.5);
                             if(amountAway == 0){
                                 flywheelMotorOne.setPower(0);
                             }
 
-                        }else{
-                            flywheelMotorOne.setPower(0);
+                        }   else{
+                                flywheelMotorOne.setPower(0);
 
-                        }
+                        }*/
 
                     }
-                    break;
+
 
         }
 
