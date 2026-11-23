@@ -24,7 +24,6 @@ public class SingleDriverTest extends OpMode {
 
         flywheelMotorOne = hardwareMap.get(DcMotorEx.class, "flywheelMotorOne");
         flywheelMotorOne.setDirection(DcMotorSimple.Direction.REVERSE);
-
         flywheelMotorTwo = hardwareMap.get(DcMotorEx.class, "flywheelMotorTwo");
 
         intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
@@ -54,6 +53,7 @@ public class SingleDriverTest extends OpMode {
                 )
         );
         follower.update();
+
 
         if (gamepad1.options) {
             follower.localizer.setHeading(0.0);
