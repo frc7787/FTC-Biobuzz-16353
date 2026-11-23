@@ -5,25 +5,18 @@ import static com.pedropathing.api.Paths.line;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 import static com.pedropathing.ivy.pedro.PedroCommands.follow;
 
-import com.pedropathing.api.Paths;
 import com.pedropathing.api.PoseFactory;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.ivy.Command;
 import com.pedropathing.ivy.Scheduler;
 import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
-import com.pedropathing.paths.interpolator.Interpolator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.firstinspires.ftc.teamcode.Robot;
+import org.firstinspires.ftc.teamcode.control.OpModeStorage;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
-
-import dev.nextftc.robot.opmode.NextAutonomous;
-import dev.nextftc.robot.opmode.NextOpMode;
 
 
 @Autonomous
@@ -49,6 +42,7 @@ public class FirstTestAuto extends OpMode {
 
     private Command autoRoutine() {
         return sequential(
+                flywheel.shootThree(2400.0),
                 follow(follower, rightToLoad)
         );
     }
@@ -56,6 +50,8 @@ public class FirstTestAuto extends OpMode {
     public void init() {
         Scheduler.reset();
         follower = Constants.create(hardwareMap);
+
+        flywheel = new Flywheel(this);
         follower.setPose(shoot_right);
         follower.update();
     }
@@ -71,4 +67,8 @@ public class FirstTestAuto extends OpMode {
         Scheduler.execute();
     }
 
+    @Override
+    public void stop() {
+        OpModeStorage.autonomousEndPose = follower.pose(); //saves your position in that file
+    }
 }
