@@ -26,9 +26,7 @@ public class FirstTestAuto extends OpMode {
     private final PoseFactory p = PoseFactory.degrees();
 
     ///left and right are relative to the driver
-    /*
 
-     */
     public final Pose shoot_right = p.of(56, 9, 90); //also start
     public final Pose shoot_left = p.of(9,132, 270);
     public final Pose loading_zone = p.of(9, 104, 90);
