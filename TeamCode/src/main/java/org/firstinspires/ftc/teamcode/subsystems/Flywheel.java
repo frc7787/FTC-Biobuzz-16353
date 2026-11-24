@@ -22,7 +22,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class Flywheel {
 
-    private static final double TICKS_PER_REV = 145.1;
+    private static final double TICKS_PER_REV = 180;
     private final DcMotorEx motorOne;
     private final DcMotorEx motorTwo;
     private final Telemetry telemetry;
@@ -36,11 +36,13 @@ public class Flywheel {
     private double targetPosition = 0.0;
     private double home = 0.0;
 
+
     double reversed = 1.0;
     public Flywheel(OpMode opMode) {
         motorOne = opMode.hardwareMap.get(DcMotorEx.class, "flywheelMotorOne");
         motorTwo = opMode.hardwareMap.get(DcMotorEx.class, "flywheelMotorTwo");
         motorTwo.setDirection(DcMotorSimple.Direction.REVERSE);
+
 
         telemetry = opMode.telemetry;
     }
@@ -67,6 +69,10 @@ public class Flywheel {
     }
     public Command off = instant(() -> mode = Mode.OFF);
 
+    public Command reset() {
+        return instant(() -> {
+        });
+    }
     public void reverse() {
         reversed = -reversed;
     }
@@ -122,7 +128,7 @@ public class Flywheel {
                     setPower(0);
                     return;
                 case POSITION:
-                    setPower(psv.calculate(motorOne.getCurrentPosition(), targetPosition));
+                    setPower(psv.calculate(motorOne.getCurrentPosition()%180, targetPosition));
                     if (abs(motorOne.getCurrentPosition() - targetPosition) < 40) {
                         mode = Mode.OFF;
                     }

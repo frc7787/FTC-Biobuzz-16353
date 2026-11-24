@@ -49,6 +49,7 @@ public class teleOp extends OpMode {
 
     @Override
     public void loop() {
+        //flywheel logic
         if (gamepad2.triangleWasPressed()) {
             flywheel.setTargetVelocity(CLOSE_RPM);
         } else if (gamepad2.squareWasPressed()) {
@@ -67,6 +68,7 @@ public class teleOp extends OpMode {
         if (gamepad2.dpadRightWasPressed()) {
             flywheel.reverse();
         }
+
         Scheduler.execute();
     }
     public Command intake() {
