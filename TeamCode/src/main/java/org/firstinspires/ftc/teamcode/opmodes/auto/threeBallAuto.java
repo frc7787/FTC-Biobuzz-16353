@@ -20,17 +20,17 @@ import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 
 
 @Autonomous
-public class FirstTestAuto extends OpMode {
+public class threeBallAuto extends OpMode {
     private Follower follower;
     private Flywheel flywheel;
     private final PoseFactory p = PoseFactory.degrees();
 
     ///left and right are relative to the driver
 
-    public final Pose shoot_right = p.of(56, 9, 90); //also start
-    public final Pose shoot_left = p.of(9,132, 270);
-    public final Pose loading_zone = p.of(9, 104, 90);
-    public final Pose garden = p.of(9,9, 270);
+    public final Pose shoot_right = p.of(56, 9, Math.PI/2); //also start
+    public final Pose shoot_left = p.of(9,132, 3*Math.PI/2);
+    public final Pose loading_zone = p.of(9, 104, Math.PI/2);
+    public final Pose garden = p.of(9,9, 3*Math.PI/2);
 
     private final Path rightToLoad = curve(shoot_right, new Pose(33, 28), loading_zone).linear(shoot_right, garden);
     private final Path rightToGarden = curve(shoot_right, new Pose(33, 28), garden).linear(shoot_right, garden);
@@ -48,10 +48,10 @@ public class FirstTestAuto extends OpMode {
     public void init() {
         Scheduler.reset();
         follower = Constants.create(hardwareMap);
-
-        flywheel = new Flywheel(this);
         follower.setPose(shoot_right);
         follower.update();
+
+        flywheel = new Flywheel(this);
     }
 
     @Override
