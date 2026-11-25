@@ -59,7 +59,7 @@ public class novScrimmageTele extends OpMode {
     private double currentRpm = ONEPOLL;
     private boolean REACHED_POS = false;
     private boolean shooterOn = false;
-    enum Poll_shooting{IDLE,AFTER_HOME,POLL_POS,AT_POS,POLL_LAUNCH};
+    enum Poll_shooting{MOVE_HOME,CHECK_HOME,IDLE,POLL_POS,AT_POS,POLL_LAUNCH};
     private Poll_shooting state = Poll_shooting.IDLE;
 
     @Override public void loop() {
@@ -110,28 +110,31 @@ public class novScrimmageTele extends OpMode {
             state = Poll_shooting.POLL_POS;
 
         }if(gamepad2.left_bumper){
-            state = Poll_shooting.IDLE;
+            state = Poll_shooting.MOVE_HOME;
         }if (gamepad2.right_bumper && state == Poll_shooting.AT_POS){
             state = Poll_shooting.POLL_LAUNCH;
         }
         switch(state) {
+            case MOVE_HOME:
+                amountAway = flywheelMotorOne.getCurrentPosition() - (flywheelMotorOne.getCurrentPosition() % 179);
+                flywheelMotorOne.setTargetPosition(amountAway);
+                flywheelMotorOne.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                flywheelMotorOne.setPower(0.7);
+                state = Poll_shooting.CHECK_HOME;
+                break;
+            case CHECK_HOME:
+                if (Math.abs(flywheelMotorOne.getCurrentPosition() - amountAway) < 5) {
+                    flywheelMotorOne.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    state = Poll_shooting.IDLE;
+                }else{
+                    state = Poll_shooting.MOVE_HOME;
+                }
+                break;
             case IDLE:
                 flywheelMotorOne.setPower(0);
                 flywheelMotorTwo.setPower(0);
-                amountAway = flywheelMotorOne.getCurrentPosition() - (flywheelMotorOne.getCurrentPosition()%180);
-                flywheelMotorOne.setTargetPosition(amountAway);
-                flywheelMotorOne.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                flywheelMotorOne.setPower(0.8);
-                if(Math.abs(flywheelMotorOne.getCurrentPosition()- amountAway)<4){
-                    flywheelMotorOne.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    flywheelMotorTwo.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    flywheelMotorOne.setPower(0);
-                    state = Poll_shooting.AFTER_HOME;
-                }
                 break;
-            case AFTER_HOME:
-                flywheelMotorOne.setPower(0);
-                break;
+
             case POLL_POS:
                 flywheelMotorOne.setTargetPosition(currentPosition);
                 flywheelMotorOne.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -150,27 +153,7 @@ public class novScrimmageTele extends OpMode {
                     timer.reset();
                     flywheelMotorOne.setVelocity(currentRpm);
                     flywheelMotorTwo.setVelocity(currentRpm);
-                    telemetry.addData("amount of time passed", timer);
-                    telemetry.update();
-                    if (timer.seconds() >= 3){
-                        telemetry.addData("amount of time passed", timer);
-                        telemetry.update();
-                        flywheelMotorOne.setPower(0.0);
-                        state = Poll_shooting.IDLE;
-
-                        /*amountAway = flywheelMotorOne.getCurrentPosition()%180;
-                        if (amountAway != 0){
-                            flywheelMotorOne.setPower(0.5);
-                            if(amountAway == 0){
-                                flywheelMotorOne.setPower(0);
-                            }
-
-                        }   else{
-                                flywheelMotorOne.setPower(0);
-
-                        }*/
-
-                    }break;
+                    break;
 
 
         }
