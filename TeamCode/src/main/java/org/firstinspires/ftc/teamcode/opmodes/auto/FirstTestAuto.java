@@ -32,11 +32,11 @@ public class FirstTestAuto extends OpMode {
     public final Pose loading_zone = p.of(9, 104, 90);
     public final Pose garden = p.of(9,9, 270);
 
-    private Path rightToLoad = curve(shoot_right, new Pose(33, 28), loading_zone).linear(shoot_right, garden);
-    private Path rightToGarden = curve(shoot_right, new Pose(33, 28), garden).linear(shoot_right, garden);
-    private Path gardenToRight = curve(garden, new Pose(33, 28), shoot_right).linear(shoot_right, garden);
-    private Path leftToGarden = line(shoot_left, garden);
-    private Path gardenToLeft = line(garden, shoot_left);
+    private final Path rightToLoad = curve(shoot_right, new Pose(33, 28), loading_zone).linear(shoot_right, garden);
+    private final Path rightToGarden = curve(shoot_right, new Pose(33, 28), garden).linear(shoot_right, garden);
+    private final Path gardenToRight = curve(garden, new Pose(33, 28), shoot_right).linear(shoot_right, garden);
+    private final Path leftToGarden = line(shoot_left, garden);
+    private final Path gardenToLeft = line(garden, shoot_left);
 
     private Command autoRoutine() {
         return sequential(

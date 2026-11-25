@@ -12,11 +12,11 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Intake {
 
     private final DcMotorEx motor;
-    private double INTAKE_POWER = 1.0;
-    private double OUTTAKE_POWER = 1.0;
+    private final double INTAKE_POWER = 1.0;
+    private final double OUTTAKE_POWER = 1.0;
     private double intake_power = 0.0;
 
-    private Telemetry telemetry;
+    private final Telemetry telemetry;
     private Gamepad gamepad;
     public boolean isAuto = false;
 

@@ -25,7 +25,7 @@ public class Drivetrain {
     public final Follower follower;
     private final Telemetry telemetry;
 
-    private Gamepad gamepad1;
+    private final Gamepad gamepad1;
 
     public Drivetrain(OpMode opMode) {
         follower = Constants.create(opMode.hardwareMap);

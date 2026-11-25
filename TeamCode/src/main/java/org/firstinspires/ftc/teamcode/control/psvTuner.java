@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.control;
 
-import com.bylazar.telemetry.PanelsTelemetry;
-import com.bylazar.telemetry.TelemetryManager;
+//import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.ivy.Command;
 import com.pedropathing.ivy.Scheduler;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -24,7 +23,7 @@ public class psvTuner extends LinearOpMode {
     public void runOpMode() {
         Scheduler.reset();
 
-        TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
+        //TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
         DcMotorEx motorOne = hardwareMap.get(DcMotorEx.class, "flywheelMotorOne");
         DcMotorEx motorTwo = hardwareMap.get(DcMotorEx.class, "flywheelMotorTwo");
@@ -66,8 +65,8 @@ public class psvTuner extends LinearOpMode {
             if (gamepad1.aWasPressed() && !Scheduler.isScheduled(kStuner)) {
                 Scheduler.schedule(kStuner);
             }
-            panelsTelemetry.addData("Flywheel Target Velocity", target);
-            panelsTelemetry.addData("Flywheel Velocity", motorOne.getVelocity());
+            //panelsTelemetry.addData("Flywheel Target Velocity", target);
+            //panelsTelemetry.addData("Flywheel Velocity", motorOne.getVelocity());
             Scheduler.execute();
             telemetry.update();
         }

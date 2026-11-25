@@ -27,14 +27,14 @@ public class Flywheel {
     private final DcMotorEx motorTwo;
     private final Telemetry telemetry;
 
-    private Controller psv = Controller.sum(
+    private final Controller psv = Controller.sum(
             Controller.proportionalFeedforward(0.0075),
             Controller.proportional(0.1),
             Controller.staticFeedforward(0.0065));
     private Mode mode = Mode.OFF;
     private double targetVelocity = 1400.0;
     private double targetPosition = 0.0;
-    private double home = 0.0;
+    private final double home = 0.0;
 
 
     double reversed = 1.0;
