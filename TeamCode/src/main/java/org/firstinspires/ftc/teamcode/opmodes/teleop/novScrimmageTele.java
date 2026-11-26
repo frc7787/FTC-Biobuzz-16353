@@ -44,12 +44,13 @@ public class novScrimmageTele extends OpMode {
     private int POLL_FOUR = 0;
     private int currentPosition = POLL_HOME;
     private boolean HOMING_POS = false;
+
     //RPM FOR POLLEN
     // NOTE THAT CENTER OF MASS OF BALLS SHOULD BE CENTERED EXCEPT POLLEN 4 or NECTAR 4 HAS TO DO A COMPLETE ROTATION
     private double HOMEPOLL = 0;
     private double ONEPOLL = 2200;
     private double TWOPOLL = 2200;
-    private double THREEPOLL = 2340;
+    private double THREEPOLL = 2460;
     private double FOURPOLL = 2660;
     //RPM FOR NECTAR
     private double ONENEC = 2400;
@@ -59,7 +60,7 @@ public class novScrimmageTele extends OpMode {
     private double currentRpm = ONEPOLL;
     private boolean REACHED_POS = false;
     private boolean shooterOn = false;
-    enum Poll_shooting{MOVE_HOME,CHECK_HOME,IDLE,POLL_POS,AT_POS,POLL_LAUNCH};
+    enum Poll_shooting{MOVE_HOME,CHECK_HOME,IDLE,POLL_POS,CHECK_POS,AT_POS,POLL_LAUNCH};
     private Poll_shooting state = Poll_shooting.IDLE;
 
     @Override public void loop() {
@@ -84,51 +85,60 @@ public class novScrimmageTele extends OpMode {
             flywheelMotorTwo.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         }
-        double motorPower = gamepad2.right_trigger;
-        flywheelMotorTwo.setPower(gamepad2.right_trigger);
-        flywheelMotorOne.setPower(motorPower*motorPower);
 
 
-        if (gamepad2.triangle){
+        if (gamepad2.triangleWasPressed()) {
             currentPosition = POLL_ONE;
             currentRpm = ONEPOLL;
             state = Poll_shooting.POLL_POS;
         }
-        if(gamepad2.circle){
+
+        if (gamepad2.circleWasPressed()) {
             currentPosition = POLL_TWO;
             currentRpm = TWOPOLL;
             state = Poll_shooting.POLL_POS;
         }
-        if(gamepad2.cross){
+
+        if (gamepad2.crossWasPressed()) {
             currentPosition = POLL_THREE;
             currentRpm = THREEPOLL;
             state = Poll_shooting.POLL_POS;
         }
-        if(gamepad2.square){
+
+        if (gamepad2.squareWasPressed()) {
             currentPosition = POLL_FOUR;
             currentRpm = FOURPOLL;
             state = Poll_shooting.POLL_POS;
-
-        }if(gamepad2.left_bumper){
+        }if(gamepad2.leftBumperWasPressed()){
             state = Poll_shooting.MOVE_HOME;
-        }if (gamepad2.right_bumper && state == Poll_shooting.AT_POS){
+        }if (gamepad2.rightBumperWasPressed() && state == Poll_shooting.AT_POS){
+            timer.reset();
             state = Poll_shooting.POLL_LAUNCH;
         }
         switch(state) {
             case MOVE_HOME:
-                amountAway = flywheelMotorOne.getCurrentPosition() - (flywheelMotorOne.getCurrentPosition() % 179);
+                flywheelMotorTwo.setPower(0);
+                amountAway = Math.round(
+                        flywheelMotorOne.getCurrentPosition() / 179.0f
+                ) * 179;
                 flywheelMotorOne.setTargetPosition(amountAway);
                 flywheelMotorOne.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                flywheelMotorOne.setPower(0.7);
+                flywheelMotorOne.setPower(0.1);
                 state = Poll_shooting.CHECK_HOME;
                 break;
             case CHECK_HOME:
-                if (Math.abs(flywheelMotorOne.getCurrentPosition() - amountAway) < 5) {
-                    flywheelMotorOne.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                int error = amountAway - flywheelMotorOne.getCurrentPosition();
+
+                if (Math.abs(error) < 2) {
+
+                    flywheelMotorOne.setPower(0);
+
+                   // flywheelMotorOne.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    flywheelMotorOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
                     state = Poll_shooting.IDLE;
-                }else{
-                    state = Poll_shooting.MOVE_HOME;
                 }
+
                 break;
             case IDLE:
                 flywheelMotorOne.setPower(0);
@@ -138,22 +148,37 @@ public class novScrimmageTele extends OpMode {
             case POLL_POS:
                 flywheelMotorOne.setTargetPosition(currentPosition);
                 flywheelMotorOne.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                flywheelMotorOne.setPower(0.6);
-                if (Math.abs(flywheelMotorOne.getCurrentPosition() - currentPosition)<2) {
+                flywheelMotorOne.setPower(0.5);
+                state = Poll_shooting.CHECK_POS;
+
+                break;
+            case CHECK_POS:
+                if (Math.abs(flywheelMotorOne.getCurrentPosition() - currentPosition)< 5) {
                     flywheelMotorOne.setPower(0);
                     flywheelMotorOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     flywheelMotorTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     state = Poll_shooting.AT_POS;
                 }
+
                 break;
+
             case AT_POS:
                 flywheelMotorOne.setPower(0);
                 break;
             case POLL_LAUNCH:
-                    timer.reset();
-                    flywheelMotorOne.setVelocity(currentRpm);
-                    flywheelMotorTwo.setVelocity(currentRpm);
-                    break;
+                flywheelMotorOne.setVelocity(currentRpm);
+                flywheelMotorTwo.setVelocity(currentRpm);
+
+                if (timer.seconds() > 1) {
+                    flywheelMotorOne.setPower(0);
+                    flywheelMotorTwo.setPower(0);
+
+                    flywheelMotorOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    flywheelMotorTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+                    state = Poll_shooting.MOVE_HOME;
+                }
+                break;
 
 
         }
@@ -194,7 +219,8 @@ public class novScrimmageTele extends OpMode {
         telemetry.addData("Motor Position 2: ",flywheelMotorTwo.getCurrentPosition());
         telemetry.addData("current rpm",+ currentRpm);
         telemetry.addData("real rpm", flywheelMotorOne.getVelocity());
-
+        telemetry.addData("TIMER",timer);
+        telemetry.addData("state",state);
         telemetry.update();
 
     }
