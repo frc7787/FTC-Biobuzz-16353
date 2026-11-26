@@ -104,6 +104,11 @@ public class novScrimmageTele extends OpMode {
         intakeMotor.setPower(gamepad2.right_trigger);
 
 
+        if(gamepad2.optionsWasPressed()){
+            amountAway = POLL_HOME;
+            currentRpm = HOMEPOLL;
+            state = Poll_shooting.POLL_POS;
+        }
         if (gamepad2.triangleWasPressed()) {
             currentPosition = POLL_ONE;
             currentRpm = ONEPOLL;
@@ -135,19 +140,19 @@ public class novScrimmageTele extends OpMode {
         switch(state) {
             case MOVE_HOME:
 
-                amountAway = ((flywheelMotorOne.getCurrentPosition() - (flywheelMotorOne.getCurrentPosition() % 180)-8));
-                flywheelMotorOne.setTargetPosition(amountAway*sign_switch);
+                flywheelMotorOne.setTargetPosition(amountAway);
                 flywheelMotorOne.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                flywheelMotorOne.setPower(0.1*sign_switch);
+                flywheelMotorOne.setPower(0.1);
+                flywheelMotorTwo.setPower(0.1);
                 state = Poll_shooting.CHECK_HOME;
                 break;
             case CHECK_HOME:
-                if ((Math.abs(flywheelMotorOne.getCurrentPosition() - amountAway*sign_switch) == 0)) {
+                if ((Math.abs(flywheelMotorOne.getCurrentPosition() - amountAway*sign_switch)<5)) {
                     flywheelMotorOne.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     state = Poll_shooting.IDLE;
                 }
                 break;
-            case IDLE:
+          case IDLE:
                 flywheelMotorOne.setPower(0);
                 flywheelMotorTwo.setPower(0);
                 break;
@@ -156,11 +161,13 @@ public class novScrimmageTele extends OpMode {
                 flywheelMotorOne.setTargetPosition(currentPosition*sign_switch);
                 flywheelMotorOne.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 flywheelMotorOne.setPower(0.5);
+                flywheelMotorTwo.setPower(0.5);
                 state = Poll_shooting.CHECK_POS;
 
                 break;
             case CHECK_POS:
                 if (Math.abs(flywheelMotorOne.getCurrentPosition() - currentPosition*sign_switch)< 5) {
+                    flywheelMotorTwo.setPower(0);
                     flywheelMotorOne.setPower(0);
                     flywheelMotorOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     flywheelMotorTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -176,7 +183,7 @@ public class novScrimmageTele extends OpMode {
                 flywheelMotorOne.setVelocity(currentRpm*sign_switch);
                 flywheelMotorTwo.setVelocity(currentRpm*sign_switch);
 
-                if (timer.seconds() > 1.7) {
+                if (timer.seconds() > 1.6) {
                     flywheelMotorOne.setPower(0);
                     flywheelMotorTwo.setPower(0);
 
