@@ -1,60 +1,43 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static com.pedropathing.ivy.commands.Commands.instant;
+
 import com.pedropathing.ivy.Command;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
-import dev.nextftc.hardware.actuators.NextMotor;
-import dev.nextftc.robot.Mechanism;
-import dev.nextftc.robot.triggers.CommandGamepad;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class Intake implements Mechanism {
+public class Intake {
 
-    private NextMotor motor = new NextMotor("intakeMotor");
-    private double INTAKE_POWER = 1.0;
-    private double OUTTAKE_POWER = 1.0;
+    private final DcMotorEx motor;
+    private final double INTAKE_POWER = 1.0;
+    private final double OUTTAKE_POWER = 1.0;
     private double intake_power = 0.0;
 
-    private boolean activated = false;
+    private final Telemetry telemetry;
+    private Gamepad gamepad;
+    public boolean isAuto = false;
 
-    private boolean auto = false;
+    public Intake(OpMode opMode) {
+        motor = opMode.hardwareMap.get(DcMotorEx.class, "intakeMotor");
 
-//    public Intake(Robot robot) {
-//        motor = robot.hardwareMap.get(DcMotorEx.class, "intakeMotor");
-//
-//        telemetry = robot.telemetry;
-//    }
+        telemetry = opMode.telemetry;
+    }
 
     public Command intake() {
-        return run(INTAKE_POWER);
+        return setIntakePower(1.0);
     }
     public Command outtake() {
-        return run(OUTTAKE_POWER);
+        return setIntakePower(-1.0);
+    }
+    public Command off() {
+        return setIntakePower(0.0);
     }
 
-//    public Command run(Double power) {
-//        return Command.build()
-//                .setStart(() -> motor.setThrottle(power))
-//                .setEnd(endCondition -> motor.setThrottle(0.0))
-//                .requiring(this);
-//    }
-    public Command run(Double power) {
-        return instant(() -> motor.setThrottle(power))
-                .setEnd(endCondition -> motor.setThrottle(0.0))
-                .requiring(motor);
-    }
-
-    public void start(CommandGamepad commandGamepad) {
-        commandGamepad.leftTrigger().isOver(0.05)
-                .whileTrue(instant(() -> this.run(commandGamepad.leftTrigger().invoke())))
-                .onFalse(instant(() -> motor.setThrottle(0.0)));
-    }
-
-    public void setIntakePower(float power) {
-        intake_power = power;
-    }
-
-    @Override
-    public void periodic() {
-
+    public Command setIntakePower(double power) {
+        return instant(()-> intake_power = power);
     }
 
 
