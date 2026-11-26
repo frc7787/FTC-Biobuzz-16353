@@ -19,6 +19,13 @@ apply plugin: 'kotlin-android'
 
 android {
     namespace = 'org.firstinspires.ftc.teamcode'
+
+    compileSdk 35
+
+    defaultConfig {
+        minSdk 24
+    }
+
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8
     }
@@ -34,8 +41,4 @@ android {
 
 dependencies {
     implementation project(':FtcRobotController')
-
-    implementation 'dev.nextftc.v2:control:0.2.1'
-    implementation 'dev.nextftc.v2:hardware:0.2.1'
-    implementation 'dev.nextftc.v2:robot:0.2.1'
 }

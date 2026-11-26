@@ -21,12 +21,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.teamcode.Robot;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
-
-import dev.nextftc.robot.opmode.NextAutonomous;
-import dev.nextftc.robot.opmode.NextOpMode;
 
 
 @Autonomous (name="SecondTestAuto")
