@@ -1,5 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
-
+import com.qualcomm.robotcore.hardware.Servo;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.ManualDrive;
 import com.qualcomm.hardware.rev.RevTouchSensor;
@@ -19,6 +19,7 @@ public class novScrimmageTele extends OpMode {
             flywheelMotorTwo,
             intakeMotor;
     private Follower follower;
+    private Servo indicator;
 
     @Override public void init() {
         follower = Constants.create(hardwareMap);
@@ -29,7 +30,7 @@ public class novScrimmageTele extends OpMode {
         flywheelMotorOne.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         flywheelMotorTwo.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
-
+        indicator = hardwareMap.get(Servo.class, "indicator");
     }
 
 
@@ -50,7 +51,7 @@ public class novScrimmageTele extends OpMode {
     private double HOMEPOLL = 0;
     private double ONEPOLL = 2200;
     private double TWOPOLL = 2200;
-    private double THREEPOLL = 2460;
+    private double THREEPOLL = 2340;
     private double FOURPOLL = 2660;
     //RPM FOR NECTAR
     private double ONENEC = 2400;
@@ -60,8 +61,12 @@ public class novScrimmageTele extends OpMode {
     private double currentRpm = ONEPOLL;
     private boolean REACHED_POS = false;
     private boolean shooterOn = false;
+    private int sign_switch = 1;
     enum Poll_shooting{MOVE_HOME,CHECK_HOME,IDLE,POLL_POS,CHECK_POS,AT_POS,POLL_LAUNCH};
     private Poll_shooting state = Poll_shooting.IDLE;
+    private boolean NEGATIVE_MODE = false;
+    private static final double RED = 0.25;
+    private static final double BLUE = 0.65;
 
     @Override public void loop() {
         follower.manual(
@@ -84,6 +89,16 @@ public class novScrimmageTele extends OpMode {
             flywheelMotorOne.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             flywheelMotorTwo.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+        }if(gamepad2.dpadDownWasPressed()){
+            NEGATIVE_MODE = true;
+        }if(gamepad2.dpadUpWasPressed()){
+            NEGATIVE_MODE = false;
+        }if (NEGATIVE_MODE){
+            sign_switch = -1;
+            indicator.setPosition(RED);
+        }if(!NEGATIVE_MODE){
+            sign_switch = 1;
+            indicator.setPosition(BLUE);
         }
 
 
@@ -118,27 +133,17 @@ public class novScrimmageTele extends OpMode {
         switch(state) {
             case MOVE_HOME:
                 flywheelMotorTwo.setPower(0);
-                amountAway = Math.round(
-                        flywheelMotorOne.getCurrentPosition() / 179.0f
-                ) * 179;
-                flywheelMotorOne.setTargetPosition(amountAway);
+                amountAway = flywheelMotorOne.getCurrentPosition() - (flywheelMotorOne.getCurrentPosition() % 180);
+                flywheelMotorOne.setTargetPosition(amountAway+6);
                 flywheelMotorOne.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                flywheelMotorOne.setPower(0.1);
+                flywheelMotorOne.setPower(0.5);
                 state = Poll_shooting.CHECK_HOME;
                 break;
             case CHECK_HOME:
-                int error = amountAway - flywheelMotorOne.getCurrentPosition();
-
-                if (Math.abs(error) < 2) {
-
-                    flywheelMotorOne.setPower(0);
-
-                   // flywheelMotorOne.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    flywheelMotorOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
+                if (Math.abs(flywheelMotorOne.getCurrentPosition() - amountAway) < 3) {
+                    flywheelMotorOne.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     state = Poll_shooting.IDLE;
                 }
-
                 break;
             case IDLE:
                 flywheelMotorOne.setPower(0);
@@ -146,7 +151,7 @@ public class novScrimmageTele extends OpMode {
                 break;
 
             case POLL_POS:
-                flywheelMotorOne.setTargetPosition(currentPosition);
+                flywheelMotorOne.setTargetPosition(currentPosition*sign_switch);
                 flywheelMotorOne.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 flywheelMotorOne.setPower(0.5);
                 state = Poll_shooting.CHECK_POS;
@@ -169,7 +174,7 @@ public class novScrimmageTele extends OpMode {
                 flywheelMotorOne.setVelocity(currentRpm);
                 flywheelMotorTwo.setVelocity(currentRpm);
 
-                if (timer.seconds() > 1) {
+                if (timer.seconds() > 1.5) {
                     flywheelMotorOne.setPower(0);
                     flywheelMotorTwo.setPower(0);
 
