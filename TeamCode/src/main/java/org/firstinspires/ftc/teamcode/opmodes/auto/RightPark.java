@@ -38,13 +38,16 @@ public class RightPark extends OpMode {
     public final Pose start_partner = p.of(32, 9, 0);
     public final Pose shoot_right = p.of(58, 12, 0); //also start
     public final Pose shoot_left = p.of(9,132, Math.PI);
-    public final Pose loading_zone = p.of(9, 95, Math.PI/2); //centeredish is 9,104
+    public final Pose loading_zone_close = p.of(9, 95, Math.PI/2); //centeredish is 9,104
+    public final Pose loading_zone_far = p.of(9, 120, Math.PI/2); //centeredish is 9,104
+
     public final Pose garden = p.of(9,9, Math.PI);
 
     public Pose start_position = start_right;
 
-    private final Path startToShoot = line(start_right, shoot_right).constant(start_right);
-    private final Path rightToLoad = curve(shoot_right, new Pose(33, 28), loading_zone).linear(shoot_right, garden);
+    private final Path startToShoot = line(start_position, shoot_right).linear(start_position, shoot_right);
+    private final Path rightToLoad = curve(shoot_right, new Pose(33, 28), loading_zone_close).linear(shoot_right, garden);
+    private final Path rightToFarLoad = curve(shoot_right, new Pose(58, 115), new Pose(66, 121), loading_zone_close);
     private final Path rightToGarden = curve(shoot_right, new Pose(33, 28), garden).linear(shoot_right, garden);
     private final Path gardenToRight = curve(garden, new Pose(33, 28), shoot_right).linear(shoot_right, garden);
     private final Path leftToGarden = line(shoot_left, garden);
@@ -54,24 +57,15 @@ public class RightPark extends OpMode {
 //    private Command localShootThree() {
 //        return
 //    }
-    private Command autoRoutine() {
-        if (partner) {
-            return sequential(
-                    waitMs(delay),
-                    follow(follower, startToShoot),
-                    flywheel.shootThree(2400.0),
-                    waitMs(200)
-            ).with(flywheel.periodic());
-        } else {
-            return sequential(
-                    waitMs(delay),
-                    follow(follower, startToShoot),
-                    flywheel.shootThree(2400.0),
-                    waitMs(200)
-            ).with(flywheel.periodic());
+
+    private Command goPark() {
+        switch (park) {
+            case BOTTOM:
+                follow(follower, rightToLoad);
+            case TOP:
+                follow(follower)
         }
     }
-
 
     private Command autoRoutine() {
         return sequential(
