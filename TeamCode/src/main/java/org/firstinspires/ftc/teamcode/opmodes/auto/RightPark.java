@@ -25,7 +25,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 public class RightPark extends OpMode {
     private Follower follower;
     private Flywheel flywheel;
-    private final PoseFactory p = PoseFactory.degrees();
+    private final PoseFactory p = PoseFactory.radians();
 
     ///left and right are relative to the driver
     enum Park {
@@ -37,9 +37,9 @@ public class RightPark extends OpMode {
     public double delay = 0.0;
     public final Pose start_right = p.of(56, 9, 0);
     public final Pose start_partner = p.of(32, 9, 0);
-    public final Pose shoot_right = p.of(58, 12, 0); //also start
+    public final Pose shoot_right = p.of(58, 14, 0); //also start
     public final Pose shoot_left = p.of(9,132, Math.PI);
-    public final Pose loading_zone_close = p.of(9, 91, Math.PI/2); //centeredish is 9,104
+    public final Pose loading_zone_close = p.of(10, 91, Math.PI/2); //centeredish is 9,104
     public final Pose loading_zone_far = p.of(9, 123, Math.PI/2);
     public final Pose garden = p.of(9,9, Math.PI);
     public Pose under_hive = p.of(59, 64, 0);
@@ -77,8 +77,7 @@ public class RightPark extends OpMode {
             return sequential(
                     follow(follower, startToHive),
                     waitMs(delay),
-                    follow(follower, hiveToShoot),
-                    waitMs(200));
+                    follow(follower, hiveToShoot));
         } else {
             return follow(follower, startToShootBasic);
         }
@@ -90,7 +89,6 @@ public class RightPark extends OpMode {
                 waitMs(250),
                 flywheel.shootThree(2400.0),
                 waitMs(200),
-                waitMs(5000),
                 goPark()
         ).with(flywheel.periodic());
     }
