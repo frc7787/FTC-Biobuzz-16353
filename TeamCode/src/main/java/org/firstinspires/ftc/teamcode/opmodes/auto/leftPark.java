@@ -3,13 +3,8 @@ package org.firstinspires.ftc.teamcode.opmodes.auto;
 import static com.pedropathing.api.Paths.curve;
 import static com.pedropathing.api.Paths.line;
 import static com.pedropathing.ivy.commands.Commands.waitMs;
-import static com.pedropathing.ivy.groups.Groups.deadline;
-import static com.pedropathing.ivy.groups.Groups.parallel;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 import static com.pedropathing.ivy.pedro.PedroCommands.follow;
-
-import static org.firstinspires.ftc.teamcode.control.AutoCommandsKt.otherShootThree;
-import static org.firstinspires.ftc.teamcode.control.AutoCommandsKt.shootThree;
 
 import com.pedropathing.api.PoseFactory;
 import com.pedropathing.follower.Follower;
@@ -19,27 +14,27 @@ import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.control.AutoCommandsKt;
 import org.firstinspires.ftc.teamcode.control.OpModeStorage;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 
 
 @Autonomous
-public class threeBallAuto extends OpMode {
+public class leftPark extends OpMode {
     private Follower follower;
     private Flywheel flywheel;
     private final PoseFactory p = PoseFactory.degrees();
 
     ///left and right are relative to the driver
 
-    public final Pose shoot_right = p.of(56, 9, Math.PI/2); //also start
-    public final Pose shoot_left = p.of(9,132, 3*Math.PI/2);
-    public final Pose loading_zone = p.of(9, 104, Math.PI);
-    public final Pose garden = p.of(9,9, 3*Math.PI/2);
+    public final Pose start_right = p.of(56, 9, 0);
+    public final Pose shoot_right = p.of(58, 12, 0); //also start
+    public final Pose shoot_left = p.of(9,132, Math.PI);
+    public final Pose loading_zone = p.of(19, 95, Math.PI/2); //centeredish is 9,104
+    public final Pose garden = p.of(9,9, Math.PI);
 
+    private final Path startToShoot = line(start_right, shoot_right).constant(start_right);
     private final Path rightToLoad = curve(shoot_right, new Pose(33, 28), loading_zone).linear(shoot_right, garden);
     private final Path rightToGarden = curve(shoot_right, new Pose(33, 28), garden).linear(shoot_right, garden);
     private final Path gardenToRight = curve(garden, new Pose(33, 28), shoot_right).linear(shoot_right, garden);
@@ -47,11 +42,12 @@ public class threeBallAuto extends OpMode {
     private final Path gardenToLeft = line(garden, shoot_left);
 
 
-//    private Command localShootThree() {
+    //    private Command localShootThree() {
 //        return
 //    }
     private Command autoRoutine() {
         return sequential(
+                follow(follower, startToShoot),
                 flywheel.shootThree(2400.0),
                 waitMs(200),
                 follow(follower, rightToLoad)
@@ -61,7 +57,7 @@ public class threeBallAuto extends OpMode {
     public void init() {
         Scheduler.reset();
         follower = Constants.create(hardwareMap);
-        follower.setPose(shoot_right);
+        follower.setPose(start_right);
         follower.update();
 
         flywheel = new Flywheel(this);
