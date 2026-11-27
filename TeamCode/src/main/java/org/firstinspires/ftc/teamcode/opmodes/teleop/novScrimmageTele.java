@@ -29,6 +29,8 @@ public class novScrimmageTele extends OpMode {
         flywheelMotorTwo = hardwareMap.get(DcMotorEx.class, "flywheelMotorTwo");
         flywheelMotorOne.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         flywheelMotorTwo.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        flywheelMotorOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        flywheelMotorTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
         indicator = hardwareMap.get(Servo.class, "indicator");
     }
@@ -159,14 +161,19 @@ public class novScrimmageTele extends OpMode {
                 }
                 break;
           case IDLE:
-                if(gamepad1.dpadUpWasPressed()){
-                    flywheelMotorOne.setPower(0.1);
-                    flywheelMotorTwo.setPower(0.1);
+                flywheelMotorOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                flywheelMotorTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                if(gamepad1.dpad_up){
+                    flywheelMotorOne.setPower(0.03);
+                    flywheelMotorTwo.setPower(0.03);
                     indicator.setPosition(RED);
-                } else if (gamepad1.dpadDownWasPressed()) {
-                    flywheelMotorTwo.setPower(-0.1);
-                    flywheelMotorOne.setPower(-0.1);
+                } else if (gamepad1.dpad_down) {
+                    flywheelMotorTwo.setPower(-0.03);
+                    flywheelMotorOne.setPower(-0.03);
                     indicator.setPosition(BLUE);
+                }else{
+                    flywheelMotorOne.setPower(0);
+                    flywheelMotorTwo.setPower(0);
                 }if(gamepad1.dpadRightWasPressed() || gamepad1.dpadLeftWasPressed()){
                     flywheelMotorOne.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     flywheelMotorTwo.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -176,7 +183,7 @@ public class novScrimmageTele extends OpMode {
             case POLL_POS:
                 flywheelMotorOne.setTargetPosition(currentPosition*sign_switch);
                 flywheelMotorOne.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                flywheelMotorOne.setPower(0.5);
+                flywheelMotorOne.setPower(0.7);
 
                 state = Poll_shooting.CHECK_POS;
 
