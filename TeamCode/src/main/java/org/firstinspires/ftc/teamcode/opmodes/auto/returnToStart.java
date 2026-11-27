@@ -31,7 +31,7 @@ public class returnToStart extends OpMode {
 
     public final Pose shoot_right = p.of(56, 9, Math.PI/2); //also start
     public final Pose shoot_left = p.of(9,132, 3*Math.PI/2);
-    public final Pose loading_zone = p.of(9, 104, Math.PI);
+    public final Pose loading_zone = p.of(9, 91, Math.PI);
     public final Pose garden = p.of(9,9, 3*Math.PI/2);
 
     private final Path LoadToRight = curve(loading_zone, new Pose(33, 28), shoot_right).linear(shoot_right, garden);

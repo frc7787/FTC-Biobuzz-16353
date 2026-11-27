@@ -90,9 +90,9 @@ public class novScrimmageTele extends OpMode {
         }
 
         if (Math.abs(gamepad2.right_trigger) > 0.1) {
-            intakeMotor.setPower(gamepad2.right_trigger);
+            intakeMotor.setPower(gamepad2.right_trigger*gamepad2.right_trigger);
         } else {
-            intakeMotor.setPower(-gamepad2.left_trigger);
+            intakeMotor.setPower(-gamepad2.left_trigger*gamepad2.left_trigger);
         }
 
 
