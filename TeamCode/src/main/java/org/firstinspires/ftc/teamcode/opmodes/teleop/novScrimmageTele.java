@@ -35,7 +35,7 @@ public class novScrimmageTele extends OpMode {
 
 
 
-    private int amountAway;
+
     ElapsedTime timer = new ElapsedTime();
     //POSITION FOR FLIPPER
     private int POLL_HOME = 0;
@@ -51,7 +51,7 @@ public class novScrimmageTele extends OpMode {
     private double HOMEPOLL = 0;
     private double ONEPOLL = 2200;
     private double TWOPOLL = 2200;
-    private double THREEPOLL = 2380;
+    private double THREEPOLL = 2460;
     private double FOURPOLL = 2660;
     //RPM FOR NECTAR
     private double ONENEC = 2400;
@@ -59,10 +59,13 @@ public class novScrimmageTele extends OpMode {
     private double THREENEC = 2660;
     private double FOURNEC = 2660;
     private double currentRpm = ONEPOLL;
+    private int amountAway = POLL_HOME;
     private boolean REACHED_POS = false;
     private boolean shooterOn = false;
+    private boolean REVERSE = false;
+    private boolean FORWARD = false;
     private int sign_switch = 1;
-    enum Poll_shooting{MOVE_HOME,CHECK_HOME,IDLE,POLL_POS,CHECK_POS,AT_POS,POLL_LAUNCH};
+    enum Poll_shooting{MANUAL,MOVE_HOME,CHECK_HOME,IDLE,POLL_POS,CHECK_POS,AT_POS,POLL_LAUNCH};
     private Poll_shooting state = Poll_shooting.IDLE;
     private boolean NEGATIVE_MODE = false;
     private static final double RED = 0.38;
@@ -82,37 +85,39 @@ public class novScrimmageTele extends OpMode {
 
         if (gamepad1.options) {
             follower.localizer.setHeading(0.0);
-        }intakeMotor.setPower(-gamepad2.left_trigger);
-        intakeMotor.setPower(gamepad2.right_trigger);
+        }
+
+        if (Math.abs(gamepad2.right_trigger) > 0.1) {
+            intakeMotor.setPower(gamepad2.right_trigger);
+        } else {
+            intakeMotor.setPower(-gamepad2.left_trigger);
+        }
 
 
         if (gamepad2.options) {
             flywheelMotorOne.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             flywheelMotorTwo.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        }if(gamepad2.dpadDownWasPressed()){
+        }
+        if (gamepad1.crossWasPressed()) {
             NEGATIVE_MODE = true;
-        }if(gamepad2.dpadUpWasPressed()){
+        }
+        if (gamepad1.triangleWasPressed()) {
             NEGATIVE_MODE = false;
-        }if (NEGATIVE_MODE){
+        }
+        if (NEGATIVE_MODE) {
             sign_switch = -1;
             indicator.setPosition(RED);
-        }if(!NEGATIVE_MODE){
+        }
+        if (!NEGATIVE_MODE) {
             sign_switch = 1;
             indicator.setPosition(BLUE);
-        }intakeMotor.setPower(-gamepad2.left_trigger);
-        intakeMotor.setPower(gamepad2.right_trigger);
-
-
-        if(gamepad2.optionsWasPressed()){
-            amountAway = POLL_HOME;
-            currentRpm = HOMEPOLL;
-            state = Poll_shooting.POLL_POS;
         }
         if (gamepad2.triangleWasPressed()) {
             currentPosition = POLL_ONE;
             currentRpm = ONEPOLL;
             state = Poll_shooting.POLL_POS;
+
         }
 
         if (gamepad2.circleWasPressed()) {
@@ -142,26 +147,37 @@ public class novScrimmageTele extends OpMode {
 
                 flywheelMotorOne.setTargetPosition(amountAway);
                 flywheelMotorOne.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                flywheelMotorOne.setPower(0.1);
-                flywheelMotorTwo.setPower(0.1);
+                flywheelMotorOne.setPower(0.5);
                 state = Poll_shooting.CHECK_HOME;
                 break;
             case CHECK_HOME:
+
                 if ((Math.abs(flywheelMotorOne.getCurrentPosition() - amountAway*sign_switch)<5)) {
-                    flywheelMotorOne.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    flywheelMotorOne.setPower(0);
+                    flywheelMotorTwo.setPower(0);
                     state = Poll_shooting.IDLE;
                 }
                 break;
           case IDLE:
-                flywheelMotorOne.setPower(0);
-                flywheelMotorTwo.setPower(0);
-                break;
+                if(gamepad1.dpadUpWasPressed()){
+                    flywheelMotorOne.setPower(0.1);
+                    flywheelMotorTwo.setPower(0.1);
+                    indicator.setPosition(RED);
+                } else if (gamepad1.dpadDownWasPressed()) {
+                    flywheelMotorTwo.setPower(-0.1);
+                    flywheelMotorOne.setPower(-0.1);
+                    indicator.setPosition(BLUE);
+                }if(gamepad1.dpadRightWasPressed() || gamepad1.dpadLeftWasPressed()){
+                    flywheelMotorOne.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    flywheelMotorTwo.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                }
+              break;
 
             case POLL_POS:
                 flywheelMotorOne.setTargetPosition(currentPosition*sign_switch);
                 flywheelMotorOne.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 flywheelMotorOne.setPower(0.5);
-                flywheelMotorTwo.setPower(0.5);
+
                 state = Poll_shooting.CHECK_POS;
 
                 break;
@@ -200,9 +216,7 @@ public class novScrimmageTele extends OpMode {
 
 
 
-        double power = gamepad1.left_trigger - gamepad1.right_trigger;
 
-        intakeMotor.setPower(power);
 
         displayDebugInfo();
     }
@@ -215,7 +229,6 @@ public class novScrimmageTele extends OpMode {
     private void displayDebugInfo() {
         telemetry.addLine("Target RPM: " + currentRpm);
         telemetry.addLine("Actual RPM: " + flywheelMotorOne.getVelocity());
-
 
             if (currentPosition == POLL_ONE)  {
                 telemetry.addLine("ONEBALL MODE pollen");
@@ -235,7 +248,10 @@ public class novScrimmageTele extends OpMode {
         telemetry.addData("real rpm", flywheelMotorOne.getVelocity());
         telemetry.addData("TIMER",timer);
         telemetry.addData("state",state);
+        telemetry.addData("dpadUp",gamepad1.dpad_up);
+        telemetry.addData("dpadDown",gamepad1.dpad_down);
         telemetry.update();
+
 
     }
 }
