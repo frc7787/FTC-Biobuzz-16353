@@ -33,7 +33,7 @@ public class leftPark extends OpMode {
     }
     private RightPark.Park park = RightPark.Park.BOTTOM;
     public boolean partner = false;
-    public double delay = 0.0;
+    public double delay = 20.0;
     public final Pose start_left = p.of(58, 132, Math.PI);
     public final Pose shoot_left = p.of(58, 127, Math.PI);
     public final Pose loading_zone_left = p.of(10, 123, Math.PI/2);

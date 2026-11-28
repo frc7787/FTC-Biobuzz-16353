@@ -35,6 +35,7 @@ public class RightPark extends OpMode {
     private Park park = Park.BOTTOM;
     public boolean partner = false;
     public double delay = 0.0;
+    public double delay2 = 0.0;
     public final Pose start_right = p.of(56, 9, 0);
     public final Pose start_partner = p.of(32, 9, 0);
     public final Pose shoot_right = p.of(58, 14, 0); //also start
@@ -85,6 +86,7 @@ public class RightPark extends OpMode {
 
     private Command autoRoutine() {
         return sequential(
+                waitMs(delay2),
                 goShoot(),
                 waitMs(250),
                 flywheel.shootThree(2400.0),
@@ -121,12 +123,18 @@ public class RightPark extends OpMode {
         telemetry.addData("(dpadR) Partner start position", partner);
 
         if (gamepad1.leftBumperWasPressed()) {
-            delay+= 250;
+            delay += 250;
         } else if (gamepad1.rightBumperWasPressed()) {
             delay -= 250;
         }
-        telemetry.addData("Delay before shooting", delay/1000+"s");
+        telemetry.addData("(bumpers) Delay before moving to shoot position in partner mode", delay/1000+"s");
 
+        if (gamepad1.xWasPressed()) {
+            delay2 += 250;
+        } else if (gamepad1.yWasPressed()) {
+            delay2 -=250;
+        }
+        telemetry.addData("(x/y) Delay before moving at all", delay2/1000+"s");
         telemetry.update();
     }
 
