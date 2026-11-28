@@ -24,48 +24,71 @@ import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 public class leftPark extends OpMode {
     private Follower follower;
     private Flywheel flywheel;
-    private final PoseFactory p = PoseFactory.degrees();
+    private final PoseFactory p = PoseFactory.radians();
 
     ///left and right are relative to the driver
-
-    public final Pose start_right = p.of(56, 9, 0);
-    public final Pose shoot_right = p.of(58, 12, 0); //also start
-    public final Pose shoot_left = p.of(9,132, Math.PI);
-    public final Pose loading_zone = p.of(19, 95, Math.PI/2); //centeredish is 9,104
+    enum Park {
+        TOP,
+        BOTTOM
+    }
+    private RightPark.Park park = RightPark.Park.BOTTOM;
+    public boolean partner = false;
+    public double delay = 0.0;
+    public final Pose start_left = p.of(58, 132, Math.PI);
+    public final Pose shoot_left = p.of(58, 127, Math.PI);
+    public final Pose loading_zone_left = p.of(10, 123, Math.PI/2);
+    public final Pose loading_zone_right = p.of(10, 91, 3*Math.PI/2); //centeredish is 9,104
     public final Pose garden = p.of(9,9, Math.PI);
 
-    private final Path startToShoot = line(start_right, shoot_right).constant(start_right);
-    private final Path rightToLoad = curve(shoot_right, new Pose(33, 28), loading_zone).linear(shoot_right, garden);
-    private final Path rightToGarden = curve(shoot_right, new Pose(33, 28), garden).linear(shoot_right, garden);
-    private final Path gardenToRight = curve(garden, new Pose(33, 28), shoot_right).linear(shoot_right, garden);
-    private final Path leftToGarden = line(shoot_left, garden);
-    private final Path gardenToLeft = line(garden, shoot_left);
+
+    private final Path leftToGarden = line(start_left, garden);
+    private final Path gardenToLeft = line(garden, start_left);
+    private final Path startToShoot = line(start_left, shoot_left).linear(start_left, shoot_left);
+    private final Path shootToLoad = line(shoot_left, loading_zone_left).linear(shoot_left, loading_zone_left);
 
 
-    //    private Command localShootThree() {
+//    private Command localShootThree() {
 //        return
 //    }
+
+
+
     private Command autoRoutine() {
         return sequential(
+                waitMs(delay),
                 follow(follower, startToShoot),
-                flywheel.shootThree(2400.0),
+                waitMs(250),
+                flywheel.shootThree(2660.0),
                 waitMs(200),
-                follow(follower, rightToLoad)
+                follow(follower, shootToLoad)
         ).with(flywheel.periodic());
     }
+
     @Override
     public void init() {
         Scheduler.reset();
         follower = Constants.create(hardwareMap);
-        follower.setPose(start_right);
-        follower.update();
 
         flywheel = new Flywheel(this);
     }
 
     @Override
     public void start() {
+        follower.setPose(start_left);
+        follower.update();
         Scheduler.schedule(autoRoutine());
+    }
+
+    @Override
+    public void init_loop() {
+        if (gamepad1.leftBumperWasPressed()) {
+            delay+= 250;
+        } else if (gamepad1.rightBumperWasPressed()) {
+            delay -= 250;
+        }
+        telemetry.addData("Delay before shooting", delay/1000+"s");
+
+        telemetry.update();
     }
 
     @Override
